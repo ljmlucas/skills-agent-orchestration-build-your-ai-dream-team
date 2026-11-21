@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Team overview</p>
+          <h1>Project Pulse</h1>
+        </div>
+        <p class="context">A concise view of project ownership, progress, and recent activity.</p>
+      </header>
+
+      <p id="loading-state" class="loading-state" role="status" aria-live="polite">Loading projects…</p>
+      <section id="dashboard" class="dashboard" aria-label="Project cards"></section>
+    </main>
+
+    <script>
+      const dashboard = document.querySelector("#dashboard");
+      const loadingState = document.querySelector("#loading-state");
+
+      function safeText(value, fallback) {
+        return typeof value === "string" && value.trim() ? value.trim() : fallback;
+      }
+
+      function badgeClass(value) {
+        const normalized = safeText(value, "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        return normalized || "unknown";
+      }
+
+      function createBadge(label, value, kind) {
+        const badge = document.createElement("span");
+        badge.className = `badge badge-${kind} badge-${badgeClass(value)}`;
+        badge.textContent = `${label}: ${safeText(value, "Unknown")}`;
+        return badge;
+      }
+
+      function createProjectCard(project) {
+        const card = document.createElement("article");
+        card.className = "project-card";
+
+        const title = document.createElement("h2");
+        title.textContent = safeText(project.name, "Unknown project");
+
+        const owner = document.createElement("p");
+        owner.className = "project-owner";
+        owner.textContent = `Owner: ${safeText(project.owner, "Unknown")}`;
+
+        const badges = document.createElement("div");
+        badges.className = "badge-list";
+        badges.append(
+          createBadge("Status", project.status, "status"),
+          createBadge("Priority", project.priority, "priority")
+        );
+
+        const activity = document.createElement("div");
+        activity.className = "activity";
+        const activityLabel = document.createElement("p");
+        activityLabel.className = "field-label";
+        activityLabel.textContent = "Recent activity";
+        const activityText = document.createElement("p");
+        activityText.className = "activity-text";
+        activityText.textContent = safeText(project.recentActivity, "Not provided");
+        activity.append(activityLabel, activityText);
+
+        card.append(title, owner, badges, activity);
+
+        const summary = typeof project.summary === "string" ? project.summary.trim() : "";
+        if (summary) {
+          const summaryText = document.createElement("p");
+          summaryText.className = "project-summary";
+          summaryText.textContent = summary;
+          card.append(summaryText);
+        }
+
+        return card;
+      }
+
+      function showMessage(message, type) {
+        const state = document.createElement("p");
+        state.className = `state-message state-${type}`;
+        state.textContent = message;
+        dashboard.replaceChildren(state);
+      }
+
+      async function loadProjects() {
+        let response;
+        try {
+          response = await fetch("project-data.json", { cache: "no-store" });
+        } catch (error) {
+          loadingState.hidden = true;
+          showMessage("Unable to load project data. Please check the local server and try again.", "error");
+          return;
+        }
+
+        if (!response.ok) {
+          loadingState.hidden = true;
+          showMessage(`Unable to load project data (HTTP ${response.status}).`, "error");
+          return;
+        }
+
+        let data;
+        try {
+          data = await response.json();
+        } catch (error) {
+          loadingState.hidden = true;
+          showMessage("Project data could not be parsed as valid JSON.", "error");
+          return;
+        }
+
+        loadingState.hidden = true;
+
+        if (!data || !Array.isArray(data.projects)) {
+          showMessage("Project data is missing the top-level projects array.", "error");
+          return;
+        }
+
+        if (data.projects.length === 0) {
+          showMessage("No projects are available yet.", "empty");
+          return;
+        }
+
+        const cards = data.projects.map((project) =>
+          createProjectCard(project && typeof project === "object" ? project : {})
+        );
+        dashboard.replaceChildren(...cards);
+      }
+
+      loadProjects();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+{
+  "projects": [
+    {
+      "name": "Launchpad",
+      "owner": "Maya Chen",
+      "status": "In progress",
+      "recentActivity": "Updated onboarding prototype 2 hours ago",
+      "priority": "High",
+      "summary": "A simpler first-run experience for new contributors."
+    },
+    {
+      "name": "Atlas",
+      "owner": "Theo Martin",
+      "status": "Active",
+      "recentActivity": "Merged API performance improvements yesterday",
+      "priority": "Medium",
+      "summary": "Improves data discovery and project reporting."
+    },
+    {
+      "name": "Harbor",
+      "owner": "Priya Shah",
+      "status": "Planning",
+      "recentActivity": "Review session scheduled for Friday",
+      "priority": "Low",
+      "summary": "Aligns deployment tooling across team environments."
+    },
+    {
+      "name": "Signal",
+      "owner": "Jordan Lee",
+      "status": "At risk",
+      "recentActivity": "Dependency review flagged today",
+      "priority": "Critical"
+    },
+    {
+      "name": "Canvas",
+      "owner": "Riley Gomez",
+      "status": "Complete",
+      "recentActivity": "Released the new documentation theme last week",
+      "priority": "Medium",
+      "summary": "Refreshes the team's contribution guides and examples."
+    },
+    {
+      "name": "Orchard",
+      "owner": "Sam Wilson",
+      "status": "On hold",
+      "recentActivity": "Waiting on stakeholder sign-off",
+      "priority": "Unknown"
+    }
+  ]
+}
